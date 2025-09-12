@@ -1,0 +1,14 @@
+k3s_cluster:
+  children:
+    servers:
+      hosts:
+        192.168.1.201:
+        192.168.1.202:
+        192.168.1.203:
+    agents:
+      hosts:
+        192.168.1.211:
+        192.168.1.212:
+  vars:
+    k3s_version: v1.33.4+k3s1
+    api_endpoint_vip: 192.168.1.220
