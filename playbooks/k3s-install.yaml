@@ -34,7 +34,7 @@
       cmd: curl -sfL https://get.k3s.io |sh -s - server --disable="traefik" --disable="servicelb" --tls-san=192.168.1.220
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
-      K3S_URL: "https://192.168.1.201:6443"
+      K3S_URL: "https://{{ api_endpoint_vip }}:6443"
       K3S_TOKEN: "{{ token }}"
 
   - name: Run K3s install script on agents
@@ -43,5 +43,5 @@
       cmd: curl -sfL https://get.k3s.io | sh -s - agent
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
-      K3S_URL: "https://192.168.1.201:6443"
+      K3S_URL: "https://{{ api_endpoint_vip }}:6443"
       K3S_TOKEN: "{{ token }}"
