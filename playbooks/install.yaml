@@ -1,0 +1,38 @@
+---
+- name: Install K3s on all nodes
+  hosts: k3s_cluster
+  gather_facts: false
+  become: true
+
+  tasks:
+  - name: Run K3s install script on first server
+    when: "inventory_hostname == groups['servers'][0]"
+    ansible.builtin.shell:
+      cmd: curl -sfL https://get.k3s.io | sh -s - server --cluster-init --disable="traefik" --disable="servicelb" --tls-san=192.168.1.220
+    environment:
+      INSTALL_K3S_VERSION: "{{ k3s_version }}"
+
+  - name: Read K3s token file from first server
+    when: "inventory_hostname == groups['servers'][0]"
+    ansible.builtin.slurp:
+      src: /var/lib/rancher/k3s/server/token
+    register: token_file
+
+  - name: Set token fact on first server
+    when: "inventory_hostname == groups['servers'][0]"
+    ansible.builtin.set_fact:
+      token: "{{ token_file['content'] | b64decode | trim }}"
+
+  - name: Set token fact on rest of servers
+    when: "'servers' in group_names and inventory_hostname != groups['servers'][0]"
+    ansible.builtin.set_fact:
+      token: "{{ hostvars[groups['servers'][0]]['token'] }}"
+
+  - name: Run K3s install script on rest of servers
+    when: "'servers' in group_names and inventory_hostname != groups['servers'][0]"
+    ansible.builtin.shell:
+      cmd: curl -sfL https://get.k3s.io |sh -s - server --disable="traefik" --disable="servicelb" --tls-san=192.168.1.220
+    environment:
+      INSTALL_K3S_VERSION: "{{ k3s_version }}"
+      K3S_URL: "https://192.168.1.201:6443"
+      K3S_TOKEN: "{{ token }}"
