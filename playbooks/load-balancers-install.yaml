@@ -1,0 +1,65 @@
+---
+- name: Install and configure HAProxy and Keepalived
+  hosts: load_balancers
+  become: true
+
+  vars:
+    haproxy_config: |
+      frontend k3s-frontend
+          bind *:6443
+          mode tcp
+          option tcplog
+          default_backend k3s-backend
+
+      backend k3s-backend
+          mode tcp
+          option tcp-check
+          balance roundrobin
+          default-server inter 10s downinter 5s
+          server k3s-server-01 192.168.1.201:6443 check
+          server k3s-server-02 192.168.1.202:6443 check
+          server k3s-server-03 192.168.1.203:6443 check
+
+  tasks:
+  - name: Ensure required packages are installed
+    ansible.builtin.apt:
+      name:
+      - haproxy
+      - keepalived
+      state: present
+      update_cache: yes
+
+  - name: Check if haproxy.cfg.bak exists
+    ansible.builtin.stat:
+      path: /etc/haproxy/haproxy.cfg.bak
+    register: haproxy_cfg_bak
+
+  - name: Backup existing haproxy.cfg
+    ansible.builtin.copy:
+      src: /etc/haproxy/haproxy.cfg
+      dest: /etc/haproxy/haproxy.cfg.bak
+      remote_src: yes
+    when: not haproxy_cfg_bak.stat.exists
+    ignore_errors: yes
+
+  - name: Ensure haproxy.cfg contains the required configuration
+    ansible.builtin.blockinfile:
+      path: /etc/haproxy/haproxy.cfg
+      marker: "# {mark} Ansible managed K3s configuration"
+      block: "{{ haproxy_config }}"
+    notify: Restart haproxy
+
+  - name: Ensure services are enabled and started
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+    loop:
+    - haproxy
+    - keepalived
+
+  handlers:
+  - name: Restart haproxy
+    systemd:
+      name: haproxy
+      state: restarted
