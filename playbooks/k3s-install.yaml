@@ -12,7 +12,7 @@
         --cluster-init \
         --disable="traefik" \
         --disable="servicelb" \
-        --tls-san={{ api_endpoint_vip }}
+        --tls-san=192.168.1.220
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
 
@@ -41,7 +41,8 @@
     ansible.builtin.shell:
       cmd: curl -sfL https://get.k3s.io |sh -s - server \
         --disable="traefik" \
-        --disable="servicelb"
+        --disable="servicelb" \
+        --tls-san=192.168.1.220
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
       K3S_URL: "https://{{ api_endpoint_vip }}:6443"
