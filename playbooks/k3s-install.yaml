@@ -8,7 +8,7 @@
   - name: Run K3s install script on first server
     when: "inventory_hostname == groups['servers'][0]"
     ansible.builtin.shell:
-      cmd: curl -sfL https://get.k3s.io | sh -s - server --cluster-init --disable="traefik" --disable="servicelb" --tls-san=192.168.1.220
+      cmd: curl -sfL https://get.k3s.io | sh -s - server --cluster-init --disable="traefik" --disable="servicelb" --tls-san={{ api_endpoint_vip }}
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
 
