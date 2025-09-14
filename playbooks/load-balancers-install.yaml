@@ -1,6 +1,7 @@
 ---
 - name: Install and configure HAProxy and Keepalived
   hosts: load_balancers
+  gather_facts: false
   become: true
 
   vars:
@@ -49,6 +50,26 @@
       block: "{{ haproxy_config }}"
     notify: Restart haproxy
 
+  - name: Deploy keepalived.conf on the first load balancer
+    when: "inventory_hostname == groups['load_balancers'][0]"
+    ansible.builtin.copy:
+      src: config/keepalived-lb1.conf
+      dest: /etc/keepalived/keepalived.conf
+      owner: root
+      group: root
+      mode: '0644'
+    notify: Restart keepalived
+
+  - name: Deploy keepalived.conf on the second load balancer
+    when: "inventory_hostname == groups['load_balancers'][1]"
+    ansible.builtin.copy:
+      src: config/keepalived-lb2.conf
+      dest: /etc/keepalived/keepalived.conf
+      owner: root
+      group: root
+      mode: '0644'
+    notify: Restart keepalived
+
   - name: Ensure services are enabled and started
     ansible.builtin.systemd:
       name: "{{ item }}"
@@ -62,4 +83,9 @@
   - name: Restart haproxy
     systemd:
       name: haproxy
+      state: restarted
+
+  - name: Restart keepalived
+    systemd:
+      name: keepalived
       state: restarted
