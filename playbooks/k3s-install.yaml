@@ -32,13 +32,16 @@
     ansible.builtin.set_fact:
       token: "{{ hostvars[groups['servers'][0]]['token'] }}"
 
+  - name: All servers and agents show the token
+    ansible.builtin.debug:
+      msg: "Token = {{ token | default('undefined') }}"
+
   - name: Run K3s install script on rest of servers
     when: "'servers' in group_names and inventory_hostname != groups['servers'][0]"
     ansible.builtin.shell:
       cmd: curl -sfL https://get.k3s.io |sh -s - server \
         --disable="traefik" \
-        --disable="servicelb" \
-        --tls-san={{ api_endpoint_vip }}
+        --disable="servicelb"
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
       K3S_URL: "https://{{ api_endpoint_vip }}:6443"
