@@ -1,15 +1,15 @@
 ---
 - name: Test inventory and variables
-  hosts: all
+  hosts: k3s_cluster
   connection: local
   gather_facts: no
 
   tasks:
-  - name: Show current host
+  - name: Show all hosts
     debug:
       msg: "Host is {{ inventory_hostname }}"
 
-  - name: Show k3s version
+  - name: Show K3s version
     debug:
       msg: "k3s_version = {{ k3s_version | default('undefined') }}"
 
@@ -20,14 +20,14 @@
   - name: First server only
     when: "inventory_hostname == groups['servers'][0]"
     debug:
-      msg: "Server = {{ inventory_hostname }}"
+      msg: "Host is {{ inventory_hostname }}"
 
   - name: Rest of servers
     when: "inventory_hostname != groups['servers'][0] and 'servers' in group_names"
     debug:
-      msg: "Server = {{ inventory_hostname }}"
+      msg: "Host is {{ inventory_hostname }}"
 
   - name: All agents
     when: "'agents' in group_names"
     debug:
-      msg: "Server = {{ inventory_hostname }}"
+      msg: "Host is {{ inventory_hostname }}"
