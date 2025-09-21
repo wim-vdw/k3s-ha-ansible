@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "Starting K3S server nodes"
+echo "Starting K3s server nodes"
 qm start 100
 qm start 101
 qm start 102
 
-echo "Starting K3S worker nodes"
+echo "Starting K3s worker nodes"
 qm start 200
 qm start 201
 

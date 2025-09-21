@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Destroying K3S server nodes"
+echo "Destroying K3s server nodes"
 qm stop 100
 qm destroy 100 --purge
 qm stop 101
@@ -8,7 +8,7 @@ qm destroy 101 --purge
 qm stop 102
 qm destroy 102 --purge
 
-echo "Destroying K3S worker nodes"
+echo "Destroying K3s worker nodes"
 qm stop 200
 qm destroy 200 --purge
 qm stop 201
