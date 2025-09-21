@@ -1,14 +1,14 @@
 #!/bin/bash
 
 echo "Stopping K3S server nodes"
-qm start 100
-qm start 101
-qm start 102
+qm stop 100
+qm stop 101
+qm stop 102
 
 echo "Stopping K3S worker nodes"
-qm start 200
-qm start 201
+qm stop 200
+qm stop 201
 
 echo "Stopping HAProxy load balancer nodes"
-qm start 300
-qm start 301
+qm stop 300
+qm stop 301
