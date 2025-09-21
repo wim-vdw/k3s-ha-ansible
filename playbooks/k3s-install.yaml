@@ -19,6 +19,7 @@
           --disable="traefik" \
           --disable="servicelb" \
           --tls-san={{ api_endpoint_vip }}
+          --node-taint CriticalAddonsOnly=true:NoExecute
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
 
@@ -46,6 +47,7 @@
           sh -s - server \
           --disable="traefik" \
           --disable="servicelb"
+          --node-taint CriticalAddonsOnly=true:NoExecute
     environment:
       INSTALL_K3S_VERSION: "{{ k3s_version }}"
       K3S_URL: "https://{{ api_endpoint_vip }}:6443"
