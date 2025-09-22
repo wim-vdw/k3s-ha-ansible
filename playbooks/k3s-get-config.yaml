@@ -1,0 +1,30 @@
+---
+- name: Get K3s on control node
+  hosts: servers
+  gather_facts: false
+
+  tasks:
+  - name: Copy kubeconfig to control node - {{ kubeconfig }}
+    when: "inventory_hostname == groups['servers'][0]"
+    become: true
+    ansible.builtin.fetch:
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: "{{ kubeconfig }}"
+      flat: true
+
+  - name: Change server address in kubeconfig on control node
+    when: "inventory_hostname == groups['servers'][0]"
+    ansible.builtin.shell: |
+      KUBECONFIG={{ kubeconfig }} kubectl config set-cluster default --server=https://{{ api_endpoint_vip }}:{{ api_port }}
+    delegate_to: 127.0.0.1
+    register: csa_result
+    changed_when:
+    - csa_result.rc == 0
+
+  - name: Setup kubeconfig context on control node - {{ cluster_context }}
+    when: "inventory_hostname == groups['servers'][0]"
+    ansible.builtin.replace:
+      path: "{{ kubeconfig }}"
+      regexp: 'default'
+      replace: '{{ cluster_context }}'
+    delegate_to: 127.0.0.1

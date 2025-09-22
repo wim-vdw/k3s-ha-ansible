@@ -17,3 +17,6 @@ k3s_cluster:
     k3s_version: v1.33.4+k3s1
     api_endpoint_vip: 192.168.1.220
     ansible_user: wim
+    kubeconfig: ~/.kube/k3s-proxmox.yaml
+    api_port: 6443
+    cluster_context: k3s-proxmox
