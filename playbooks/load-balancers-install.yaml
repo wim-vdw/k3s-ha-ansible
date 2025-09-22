@@ -26,11 +26,12 @@
     community.general.timezone:
       name: Europe/Brussels
 
-  - name: Ensure required packages are installed
+  - name: Ensure required packages are installed (haproxy, keepalived, nfs-common)
     ansible.builtin.apt:
       name:
       - haproxy
       - keepalived
+      - nfs-common
       state: present
       update_cache: yes
 

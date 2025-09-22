@@ -9,6 +9,13 @@
     community.general.timezone:
       name: Europe/Brussels
 
+  - name: Ensure required packages are installed (nfs-common)
+    ansible.builtin.apt:
+      name:
+      - nfs-common
+      state: present
+      update_cache: yes
+
   - name: Run K3s install script on first server
     when: "inventory_hostname == groups['servers'][0]"
     ansible.builtin.shell:
